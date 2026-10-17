@@ -5,6 +5,35 @@ export interface Source {
   url: string | null;
   category: string;
   directions: string;
+  file_id: string;
+  mime: string;
+  /** PDF page the passage starts on, when known */
+  page: number | null;
+  /** the passage Howie used */
+  quote: string;
+}
+
+/** Can the document panel show this file inline? (PDFs, and Google Docs/Slides/Sheets as PDF) */
+export const viewable = (mime: string): boolean =>
+  mime === 'application/pdf' ||
+  mime === 'application/vnd.google-apps.document' ||
+  mime === 'application/vnd.google-apps.presentation' ||
+  mime === 'application/vnd.google-apps.spreadsheet';
+
+/** Downloads a library document through the signed-in site (the Drive folder stays private). */
+export async function fetchDocument(fileId: string, signal?: AbortSignal): Promise<Blob> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error('Please sign in again.');
+  const res = await fetch(`/api/kb-file?id=${encodeURIComponent(fileId)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal,
+  });
+  if (!res.ok) {
+    const j = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(j.message || `Error ${res.status}`);
+  }
+  return res.blob();
 }
 
 export interface AskResult {

@@ -186,3 +186,25 @@ export async function readFileText(
   }
   return { text: '', note: 'This file type is found by name only.' };
 }
+
+const GOOGLE_NATIVE_TO_PDF = new Set([
+  'application/vnd.google-apps.document',
+  'application/vnd.google-apps.presentation',
+  'application/vnd.google-apps.spreadsheet',
+]);
+
+/** True when the document panel can show this file as a PDF. */
+export const viewableAsPdf = (mime: string): boolean =>
+  mime === 'application/pdf' || GOOGLE_NATIVE_TO_PDF.has(mime);
+
+/**
+ * Downloads a library file for the document panel. Google Docs, Slides and Sheets come back as PDF;
+ * PDFs come back as they are; anything else comes back as the original file (for download only).
+ */
+export async function fetchForViewer(token: string, fileId: string, mime: string): Promise<Response> {
+  const id = encodeURIComponent(fileId);
+  const path = GOOGLE_NATIVE_TO_PDF.has(mime)
+    ? `/files/${id}/export?mimeType=application/pdf`
+    : `/files/${id}?alt=media&supportsAllDrives=true`;
+  return driveGet(token, path);
+}

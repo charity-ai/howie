@@ -2,7 +2,7 @@ import { extractFolderId, json, type Env } from '../_lib/env';
 import { bearer, rpc } from '../_lib/supabase';
 import { getAccessToken, listLibrary, readFileText, type DriveFile } from '../_lib/google';
 import { embed } from '../_lib/gemini';
-import { chunkText } from '../_lib/chunk';
+import { chunkWithPages } from '../_lib/chunk';
 
 const MAX_HOPS = 60;
 
@@ -88,15 +88,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUnti
     const existed = known.has(file.id);
     let status: 'ready' | 'card_only' | 'error' = 'ready';
     let error: string | null = null;
-    let chunks: { kind: string; text: string; embedding: number[] }[] | null = [];
+    let chunks: { kind: string; text: string; page: number | null; embedding: number[] }[] | null = [];
 
     try {
       const r = await readFileText(env, gToken, file);
-      const pieces: { kind: 'card' | 'doc'; text: string }[] = [
-        { kind: 'card', text: `Document: ${file.name}. Folder: ${file.path}.` },
+      const pieces: { kind: 'card' | 'doc'; text: string; page: number | null }[] = [
+        { kind: 'card', text: `Document: ${file.name}. Folder: ${file.path}.`, page: null },
       ];
       if (r.text.trim()) {
-        for (const t of chunkText(r.text)) pieces.push({ kind: 'doc', text: t });
+        for (const c of chunkWithPages(r.text)) pieces.push({ kind: 'doc', text: c.text, page: c.page });
       } else {
         status = 'card_only';
         error = r.note ?? 'No readable text found.';
@@ -106,7 +106,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUnti
         pieces.map((p) => (p.kind === 'card' ? p.text : `${file.name}\n${p.text}`)),
         'RETRIEVAL_DOCUMENT',
       );
-      chunks = pieces.map((p, i) => ({ kind: p.kind, text: p.text, embedding: vectors[i] }));
+      chunks = pieces.map((p, i) => ({ kind: p.kind, text: p.text, page: p.page, embedding: vectors[i] }));
     } catch (e) {
       status = 'error';
       error = (e instanceof Error ? e.message : String(e)).slice(0, 300);

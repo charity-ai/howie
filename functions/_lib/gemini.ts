@@ -80,7 +80,7 @@ export async function readPdf(env: Env, base64: string): Promise<string> {
         parts: [
           { inline_data: { mime_type: 'application/pdf', data: base64 } },
           {
-            text: 'Transcribe all the text in this document exactly as written. Keep numbers, dollar amounts, percentages and dates exactly. Write tables as plain text rows. Do not summarize or add commentary. Output the text only.',
+            text: 'Transcribe all the text in this document exactly as written. Keep numbers, dollar amounts, percentages and dates exactly. Write tables as plain text rows. Do not summarize or add commentary. At the start of every page, on its own line, write [[page N]] where N is the position of that page in this PDF file counting from 1 (ignore any page numbers printed on the page). Output the text only.',
           },
         ],
       },

@@ -14,6 +14,26 @@ interface MatchRow {
   file_id: string;
   score: number;
   route: string | null;
+  page: number | null;
+}
+
+interface SourceOut {
+  title: string;
+  url: string | null;
+  category: string;
+  directions: string;
+  file_id: string;
+  mime: string;
+  page: number | null;
+  quote: string;
+}
+
+/** The passage Howie used, trimmed to a readable length at a word break. */
+function quoteOf(passage: string, max = 700): string {
+  const t = passage.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.lastIndexOf(' ', max);
+  return `${t.slice(0, cut > max * 0.6 ? cut : max)}…`;
 }
 
 interface CatalogRow {
@@ -86,12 +106,21 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     // up to 3 distinct documents to link
     const seen = new Set<string>();
-    const sources: { title: string; url: string | null; category: string; directions: string }[] = [];
+    const sources: SourceOut[] = [];
     if (answered) {
       for (const r of rows) {
         if (seen.has(r.file_id)) continue;
         seen.add(r.file_id);
-        sources.push({ title: r.title, url: r.url, category: r.category, directions: r.directions });
+        sources.push({
+          title: r.title,
+          url: r.url,
+          category: r.category,
+          directions: r.directions,
+          file_id: r.file_id,
+          mime: r.mime,
+          page: r.kind === 'doc' ? (r.page ?? null) : null,
+          quote: r.kind === 'doc' ? quoteOf(r.passage) : '',
+        });
         if (sources.length === 3) break;
       }
     }
