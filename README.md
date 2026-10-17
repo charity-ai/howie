@@ -20,7 +20,8 @@ Browser ── /api/kb-ask ── embed question ── kb_match ─┘── Ge
 | Path | What it is |
 |---|---|
 | `howie-schema.sql` | Database script. Paste into each client's Supabase SQL Editor. Safe to run twice. |
-| `functions/api/kb-ask.ts` | Answer endpoint (text answer, or raw passages for voice) |
+| `functions/api/kb-ask.ts` | Answer endpoint (text answer, or raw passages for voice), with the source file, page and passage |
+| `functions/api/kb-file.ts` | Sends one library document to a signed-in user for the document panel |
 | `functions/api/kb-ingest.ts` | Sync worker: reads Drive, chunks (1,800 chars, 200 overlap), embeds, saves. One document per call, chains up to 60 times |
 | `functions/_lib/` | Gemini, Google Drive (service account), Supabase and chunking helpers |
 | `src/` | The web app: sign-in, ask box, answer card, admin panel, voice button. English and Spanish |
@@ -63,7 +64,8 @@ npm run typecheck
 ## Known limits and things to check
 
 - **Not yet run against live services.** The code compiles and the helpers are tested, but nothing here has been run against a real Supabase project, Gemini key, Google Drive or ElevenLabs agent. Expect a short debugging pass on the first deploy. Test in this order: sign in, sync three documents, ask a number question, then voice.
-- **Document links need Drive access.** The Drive folder is private, so the "Open document" link only works for people who also have Drive access to that folder. Share the folder (Viewer) with the board members who need to open originals, or leave links off and let Howie quote and name the document.
+- **Document panel.** When Howie answers (typed or spoken), the source document opens beside the answer with the exact passage Howie used. PDFs open at the right page in Chrome, Edge and Firefox (Safari, including iPhone, opens at page 1). Google Docs, Slides and Sheets show as PDFs. Word files can't be shown inline, only downloaded, so prefer PDFs or Google Docs in the library. Files load through the signed-in site (`/api/kb-file`), so the Drive folder never has to be shared with board members.
+- **Page numbers come from the sync.** Only PDFs read after this update know their pages. If a library was synced before, run `update public.kb_documents set drive_modified_at = null;` in the Supabase SQL Editor, then press **Sync now** to re-read everything.
 - **Cloudflare plan.** The free Workers plan has a very small CPU budget per request; reading large PDFs or Word files can exceed it. If sync shows errors on big files, use the Workers Paid plan for the production projects.
 - **Sheets** sync only their first tab as CSV. **PDFs** over 7 MB and images/video are found by name only ("card_only").
 - **Weekly sync** runs from the database (Mondays 13:00 UTC) and needs the real site address in the schema's `kb_cron_sync` function.

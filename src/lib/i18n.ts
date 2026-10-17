@@ -49,6 +49,16 @@ const en = {
   errorGeneric: 'Something went wrong. Please try again.',
   configMissing: 'This site is not configured yet (missing Supabase values).',
   loading: 'Loading…',
+  showDoc: 'Show document',
+  showing: 'Showing',
+  docPanel: 'Document',
+  quoteTitle: 'The part Howie used',
+  page: 'Page',
+  openFull: 'Open full screen',
+  download: 'Download',
+  docLoading: 'Opening the document…',
+  close: 'Close',
+  notViewable: 'This file type cannot be shown here. Download it, or add a PDF or Google Doc version to the library.',
 };
 
 const es: typeof en = {
@@ -98,6 +108,16 @@ const es: typeof en = {
   errorGeneric: 'Algo salió mal. Inténtalo de nuevo.',
   configMissing: 'Este sitio aún no está configurado (faltan valores de Supabase).',
   loading: 'Cargando…',
+  showDoc: 'Ver documento',
+  showing: 'En pantalla',
+  docPanel: 'Documento',
+  quoteTitle: 'La parte que usó Howie',
+  page: 'Página',
+  openFull: 'Abrir en pantalla completa',
+  download: 'Descargar',
+  docLoading: 'Abriendo el documento…',
+  close: 'Cerrar',
+  notViewable: 'Este tipo de archivo no se puede mostrar aquí. Descárgalo o agrega una versión en PDF o Google Docs a la biblioteca.',
 };
 
 export type Key = keyof typeof en;

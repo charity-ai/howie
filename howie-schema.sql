@@ -109,6 +109,8 @@ create table if not exists public.kb_chunks (
   text        text not null,
   embedding   extensions.vector(768) not null
 );
+-- page the passage starts on (PDFs only; added for the document panel; safe on older installs)
+alter table public.kb_chunks add column if not exists page int;
 create index if not exists kb_chunks_embedding_idx
   on public.kb_chunks using hnsw (embedding extensions.vector_cosine_ops);
 create index if not exists kb_chunks_document_idx on public.kb_chunks (document_id);
@@ -210,12 +212,13 @@ begin
   delete from kb_chunks where document_id = v_id;
 
   for c in select * from jsonb_array_elements(p_chunks) loop
-    insert into kb_chunks (document_id, kind, seq, text, embedding)
+    insert into kb_chunks (document_id, kind, seq, text, page, embedding)
     values (
       v_id,
       coalesce(c->>'kind', 'doc'),
       v_seq,
       c->>'text',
+      nullif(c->>'page', '')::int,
       (select ('[' || string_agg(e::text, ',') || ']')::extensions.vector(768)
          from jsonb_array_elements_text(c->'embedding') e)
     );
@@ -244,9 +247,11 @@ begin
 end $$;
 
 -- the search: the question's vector in, the closest passages out (signed-in users only)
-create or replace function public.kb_match(p_query jsonb, p_k int default 8, p_lang text default 'en')
+-- (dropped first because its columns changed when page was added)
+drop function if exists public.kb_match(jsonb, int, text);
+create function public.kb_match(p_query jsonb, p_k int default 8, p_lang text default 'en')
 returns table(title text, url text, category text, directions text, snippet text, passage text,
-              kind text, mime text, file_id text, score double precision, route text)
+              kind text, mime text, file_id text, score double precision, route text, page int)
 language sql stable security definer set search_path to 'public', 'extensions' as $$
   with q as (
     select ('[' || string_agg(e::text, ',') || ']')::extensions.vector(768) as v
@@ -259,7 +264,8 @@ language sql stable security definer set search_path to 'public', 'extensions' a
          left(c.text, 4000),
          c.kind, d.mime, d.file_id,
          1 - (c.embedding <=> (select v from q)),
-         d.route
+         d.route,
+         c.page
   from kb_chunks c join kb_documents d on d.id = c.document_id
   where (select auth.uid()) is not null and d.status <> 'removed'
   order by c.embedding <=> (select v from q)
