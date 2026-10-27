@@ -46,8 +46,14 @@ Answer in the language the person speaks. In Spanish use informal "tú".
 
 ## Voice tab
 
-- Choose a warm, confident adult voice and a **multilingual** voice model so Spanish works.
-- Pronunciation: teach it "Howie" as "HOW-ee" if it mispronounces the name.
+**Howie's voice ID:** `Bj9UqZbhQsanLzgalpEG` (chosen Oct 2026; may change)
+
+1. In the agent, open the **Voice** tab and pick this voice (or paste the voice ID).
+2. Use a **multilingual** voice model so Spanish works.
+3. Starting settings from the Howie character card: Stability about 0.5, Similarity about 0.75, Speed 1.0 (steady and conversational). Adjust by ear.
+4. Pronunciation: teach it "Howie" as "HOW-ee" if it mispronounces the name.
+
+**Changing the voice later:** pick the new voice in this tab and save. Nothing in the code or Cloudflare changes and no redeploy is needed; every client's site uses the new voice on its next call. Update the voice ID above so this doc stays true.
 
 ## Tools tab: add one tool (this is the one that matters)
 

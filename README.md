@@ -25,8 +25,8 @@ Browser ── /api/kb-ask ── embed question ── kb_match ─┘── Ge
 | `functions/_lib/` | Gemini, Google Drive (service account), Supabase and chunking helpers |
 | `src/` | The web app: sign-in, ask box, answer card, admin panel, voice button. English and Spanish |
 | `public/_headers` | Security headers plus the microphone permission voice needs |
-| `public/howie.svg` | Placeholder logo (replace with the final icon) |
-| `docs/elevenlabs-agent.md` | Exact prompt, tool and security settings for Howie's voice |
+| `public/howie-*`, `favicon.ico`, `apple-touch-icon.png` | Howie's official avatar, favicon and custom cursor (made from the official Howie image; do not alter the artwork) |
+| `docs/elevenlabs-agent.md` | Exact prompt, tool, voice ID and security settings for Howie's voice |
 
 ## Set up (follow the Key Tracker spreadsheet for click-by-click steps)
 

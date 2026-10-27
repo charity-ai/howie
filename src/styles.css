@@ -63,7 +63,7 @@ input:focus, textarea:focus, button:focus-visible, a:focus-visible {
   outline: 3px solid rgba(242, 164, 58, 0.55); outline-offset: 1px;
 }
 
-button { font: inherit; cursor: pointer; border-radius: 10px; min-height: 44px; }
+button { font: inherit; border-radius: 10px; min-height: 44px; }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 .primary { background: var(--navy); color: #fff; border: 0; padding: 0 18px; font-weight: 600; width: 100%; }
 .primary.live { background: var(--amber); color: var(--navy); }
@@ -97,3 +97,10 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   .primary { width: auto; min-width: 180px; }
   .page { padding-top: 8px; }
 }
+
+/* Howie cursor: his head with the arrow; the hotspot (18 17) is the arrow tip.
+   Text fields keep the normal text cursor so typing stays easy. */
+html, body { cursor: url('/howie-cursor-32.png') 18 17, url('/howie-cursor.cur'), auto; }
+a, button, [role='button'] { cursor: url('/howie-cursor-32.png') 18 17, url('/howie-cursor.cur'), pointer; }
+input, textarea { cursor: text; }
+button:disabled { cursor: not-allowed; }
