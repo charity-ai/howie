@@ -5,7 +5,7 @@ import { useLang } from '../lib/i18n';
 function Brand({ tagline }: { tagline: string }) {
   return (
     <div className="brand">
-      <img src="/howie.svg" alt="" width={56} height={56} />
+      <img src="/howie-avatar-256.png" alt="Howie" width={72} height={72} />
       <h1>Howie</h1>
       <p className="muted">{tagline}</p>
     </div>

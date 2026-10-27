@@ -70,7 +70,7 @@ export default function Howie({ profile }: { profile: Profile }) {
     <main className="page">
       <header className="topbar">
         <div className="row">
-          <img src="/howie.svg" alt="" width={36} height={36} />
+          <img src="/howie-avatar-128.png" alt="" width={36} height={36} />
           <strong>Howie</strong>
         </div>
         <div className="row">
